@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package auth.v1;
+
+import "google/api/annotations.proto";
+import "gogoproto/gogo.proto";
+
+service AuthService {
+  rpc Ping(PingRequest) returns (PingResponse) {
+    option (google.api.http) = {
+      get : "/v1/auth/ping"
+    };
+  }
+  rpc Login(UserLoginRequest) returns (UserLoginResponse) {
+    option (google.api.http) = {
+      post : "/v1/auth/login"
+      body : "*"
+    };
+  }
+}
+
+message PingRequest {}
+
+message PingResponse {}
+
+message UserLoginRequest {
+  string username = 1 [(gogoproto.moretags) = "validate:\"required\""];
+  string password = 2 [(gogoproto.moretags) = "validate:\"required\""];
+}
+
+message UserLoginResponse { string access_token = 1; }

@@ -52,6 +52,28 @@
         ]
       }
     },
+    "/v1/user/ping": {
+      "get": {
+        "operationId": "UserService_Ping",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1PingResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "UserService"
+        ]
+      }
+    },
     "/v1/user/{id}": {
       "get": {
         "operationId": "UserService_Retrieve",
@@ -319,6 +341,9 @@
           "format": "uint64"
         }
       }
+    },
+    "v1PingResponse": {
+      "type": "object"
     },
     "v1RetrieveResponse": {
       "type": "object",

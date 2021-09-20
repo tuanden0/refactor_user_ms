@@ -26,7 +26,6 @@ func (s *service) Create(ctx context.Context, in *userV1PB.CreateRequest) (*user
 	// Add data to database
 	user, createErr := s.repo.Create(u)
 	if createErr != nil {
-		s.log.Error("failed to create user", zap.String("create_user_error", createErr.Error()))
 		return nil, helpers.CreateError
 	}
 

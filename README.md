@@ -4,19 +4,21 @@ This repository is a refactor of [user_ms](https://github.com/tuanden0/user_ms/)
 
 ## Todo
 
-Re-Implement User service
+~~Re-Implement User service~~
 
 Re-Implement Authentication service
+
+Intergrate between two services
 
 Make structure for application to easy to implement new gRPC server and HTTP server
 
 Run gRPC and HTTP same port
 
-Implement and support multiple logger such as zap, logrus, ...
+~~Implement and support multiple logger such as zap, logrus, ...~~
 
-Implement and support multiple database driver or ORM such as gorm, ent, pg, ...
+~~Implement and support multiple database driver or ORM such as gorm, ent, pg, ...~~
 
-Log all error in service and repository
+~~Log all error in service and repository~~
 
 ## All knowledge is gathered on internet
 

@@ -11,7 +11,7 @@ type User struct {
 	Username string
 	Password string
 	Email    string
-	Role     string
+	Role     uint32
 }
 
 func (u *User) GetID() uint64 {
@@ -34,7 +34,7 @@ func (u *User) GetPassWord() string {
 	return u.Password
 }
 
-func (u *User) GetRole() string {
+func (u *User) GetRole() uint32 {
 	return u.Role
 }
 

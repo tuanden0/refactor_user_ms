@@ -25,6 +25,11 @@ option (gogoproto.goproto_stringer_all) = false;
 option (gogoproto.stringer_all) = true;
 
 service UserService {
+  rpc Ping(PingRequest) returns (PingResponse) {
+    option (google.api.http) = {
+      get : "/v1/user/ping"
+    };
+  }
   rpc Create(CreateRequest) returns (CreateResponse) {
     option (google.api.http) = {
       post : "/v1/user"
@@ -77,17 +82,14 @@ enum Role {
   ROLE_USER = 2;
 }
 
+message PingRequest {}
+
+message PingResponse {}
+
 message CreateRequest {
   string username = 1 [(gogoproto.moretags) = "validate:\"required,gt=3\""];
   string password = 2 [(gogoproto.moretags) = "validate:\"required,gt=4\""];
   string email = 3 [(gogoproto.moretags) = "validate:\"required,email\""];
-  Role role = 4;
-}
-
-message User {
-  uint64 id = 1;
-  string username = 2;
-  string email = 3;
   Role role = 4;
 }
 

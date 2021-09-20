@@ -7,29 +7,24 @@ import (
 	userV1PB "github.com/tuanden0/refactor_user_ms/proto/gen/go/user/v1"
 )
 
-func MapCreateRequest(ctx context.Context, in *userV1PB.CreateRequest) (*models.User, error) {
+func MapUpdateRequest(ctx context.Context, in *userV1PB.UpdateRequest) (*models.User, error) {
 
 	u := &models.User{
+		ID:       in.GetId(),
 		Username: in.GetUsername(),
 		Password: in.GetPassword(),
 		Email:    in.GetEmail(),
-		Role:     in.GetRole().String(),
+		Role:     uint32(in.GetRole()),
 	}
-
-	hash, err := u.HashPassword()
-	if err != nil {
-		return nil, err
-	}
-	u.Password = hash
 
 	return u, nil
 }
 
-func MapCreateResponse(u *models.User) *userV1PB.CreateResponse {
-	return &userV1PB.CreateResponse{
+func MapUpdateResponse(u *models.User) *userV1PB.UpdateResponse {
+	return &userV1PB.UpdateResponse{
 		Id:       u.GetID(),
 		Username: u.GetUserName(),
 		Email:    u.GetEmail(),
-		Role:     userV1PB.Role(userV1PB.Role_value[u.GetRole()]),
+		Role:     userV1PB.Role(u.GetRole()),
 	}
 }

@@ -1,4 +1,4 @@
-package validator
+package validators
 
 import (
 	"fmt"
@@ -37,8 +37,8 @@ func (v *Validator) InitTranslator() error {
 	})
 
 	// Register custom error msg translator
-	v.registerCustomTranslate(trans, "required", "{0} is a required field!")
-	v.registerCustomTranslate(trans, "email", "{0} must be a valid email!")
+	v.registerCustomTranslate(trans, "required", "{0} is a required field")
+	v.registerCustomTranslate(trans, "email", "{0} must be a valid email")
 
 	return nil
 }

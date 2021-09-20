@@ -5,12 +5,12 @@ import (
 	"go.uber.org/zap"
 )
 
-func (m *manager) Retrieve(id string) (*models.User, error) {
+func (m *manager) Retrieve(id uint64) (*models.User, error) {
 
 	user := models.User{}
 
 	if err := m.db.First(&user, id).Error; err != nil {
-		m.log.Error(err.Error(), zap.Any("gorm", "retrieve"))
+		m.log.Error(err.Error(), zap.String("gorm", "retrieve"))
 		return nil, err
 	}
 

@@ -5,17 +5,17 @@ import (
 	"go.uber.org/zap"
 )
 
-func (m *manager) Update(id string, in models.User) (*models.User, error) {
+func (m *manager) Update(id uint64, in *models.User) (*models.User, error) {
 
 	user := models.User{}
 
 	if err := m.db.Where("id = ?", id).First(&user).Error; err != nil {
-		m.log.Error(err.Error(), zap.Any("gorm", "update_find_user"))
+		m.log.Error(err.Error(), zap.String("gorm", "update_find_user"))
 		return nil, err
 	}
 
 	if err := m.db.Model(&user).Omit("id").Updates(&in).Error; err != nil {
-		m.log.Error(err.Error(), zap.Any("gorm", "update"))
+		m.log.Error(err.Error(), zap.String("gorm", "update"))
 		return nil, err
 	}
 

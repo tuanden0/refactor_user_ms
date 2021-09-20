@@ -17,11 +17,12 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/status"
 
-	gormdriver "github.com/tuanden0/refactor_user_ms/internal/database/mysql/gorm_driver"
-	logger "github.com/tuanden0/refactor_user_ms/internal/log/zap_driver"
+	gormdriver "github.com/tuanden0/refactor_user_ms/internal/databases/mysql/gorm_driver"
+	logger "github.com/tuanden0/refactor_user_ms/internal/logs/zap_driver"
 	"github.com/tuanden0/refactor_user_ms/internal/userapis/user/v1/repositories"
 	userV1 "github.com/tuanden0/refactor_user_ms/internal/userapis/user/v1/services"
-	"github.com/tuanden0/refactor_user_ms/internal/validator"
+	userVD "github.com/tuanden0/refactor_user_ms/internal/userapis/user/v1/validators"
+	vd "github.com/tuanden0/refactor_user_ms/internal/validators"
 	userV1PB "github.com/tuanden0/refactor_user_ms/proto/gen/go/user/v1"
 )
 
@@ -59,13 +60,19 @@ func main() {
 	userRepo := repositories.NewManager(gormDB, logger.Log)
 	logger.Info("Init user repository manager success", nil)
 
-	// Create validator
-	logger.Info("Init user validator", nil)
-	userValidator := validator.NewValidator(*logger.Log)
-	if validatorErr := userValidator.InitTranslator(); validatorErr != nil {
+	// Create global validator
+	logger.Info("Init validator", nil)
+	validator := vd.NewValidator(*logger.Log)
+	validator.InitValidate()
+	if validatorErr := validator.InitTranslator(); validatorErr != nil {
 		logger.Error("failed to init validator translator %v", validatorErr)
 		log.Fatal(validatorErr)
 	}
+	logger.Info("Init user validator success", nil)
+
+	// Create user validator
+	logger.Info("Init user validator", nil)
+	userValidator := userVD.NewUserValidator(validator)
 	logger.Info("Init user validator success", nil)
 
 	// Create user service
@@ -193,10 +200,15 @@ func runServer(service userV1.Service) error {
 		return handlerErr
 	}
 
+	gwServer := http.Server{
+		Addr:    gwAddr,
+		Handler: grpcHandlerFunc(grpcServer, gwmux),
+	}
+
 	// Run gRPC-gateway server
 	go func() {
 		logger.Info("Gateway listening on: %v", gwAddr)
-		errChan <- http.ListenAndServe(gwAddr, grpcHandlerFunc(grpcServer, gwmux))
+		errChan <- gwServer.ListenAndServe()
 	}()
 
 	// Handle shutdown signal
@@ -206,6 +218,7 @@ func runServer(service userV1.Service) error {
 		logger.Info("got %v signal, graceful shutdown server", <-c)
 		cancel()
 		grpcServer.GracefulStop()
+		gwServer.Shutdown(ctx)
 		close(errChan)
 	}()
 
