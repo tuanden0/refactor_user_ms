@@ -1,8 +1,6 @@
 package zapdriver
 
 import (
-	"fmt"
-
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -38,22 +36,12 @@ func Field(key string, value interface{}) zap.Field {
 	return zap.Any(key, value)
 }
 
-func Info(format string, a interface{}, tags ...zap.Field) {
-
-	if a != nil {
-		format = fmt.Sprintf(format, a)
-	}
-
-	Log.Info(format, tags...)
+func Info(msg string, tags ...zap.Field) {
+	Log.Info(msg, tags...)
 	Log.Sync()
 }
 
-func Error(format string, a interface{}, tags ...zap.Field) {
-
-	if a != nil {
-		format = fmt.Sprintf(format, a)
-	}
-
-	Log.Error(format, tags...)
+func Error(msg string, tags ...zap.Field) {
+	Log.Error(msg, tags...)
 	Log.Sync()
 }

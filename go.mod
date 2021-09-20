@@ -10,6 +10,7 @@ require (
 	github.com/golang/protobuf v1.5.2
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.6.0
+	github.com/sirupsen/logrus v1.8.1
 	go.uber.org/zap v1.19.1
 	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97
 	google.golang.org/genproto v0.0.0-20210917145530-b395a37504d4
@@ -23,7 +24,6 @@ require (
 	github.com/jinzhu/now v1.1.2 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/mattn/go-sqlite3 v1.14.8 // indirect
-	github.com/sirupsen/logrus v1.8.1 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	golang.org/x/net v0.0.0-20210405180319-a5a99cb37ef4 // indirect

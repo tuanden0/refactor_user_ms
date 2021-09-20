@@ -5,6 +5,7 @@ import (
 
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
+	logger "github.com/tuanden0/refactor_user_ms/internal/logs/zap_driver"
 	"go.uber.org/zap"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
@@ -19,16 +20,14 @@ var (
 type Validator struct {
 	Validate *validator.Validate
 	Trans    ut.Translator
-	log      zap.Logger
 }
 
-func NewValidator(log zap.Logger) Validator {
+func NewValidator() Validator {
 	validateOnce.Do(func() {
 		v := validator.New()
 
 		valid := Validator{
 			Validate: v,
-			log:      log,
 		}
 		Valid = valid
 	})
@@ -54,7 +53,7 @@ func (v *Validator) ParseError(err error) error {
 
 	st, err = st.WithDetails(br)
 	if err != nil {
-		v.log.Error("Unexpected error attaching metadata", zap.Any("validator_parse_error", err.Error()))
+		logger.Error("Unexpected error attaching metadata", zap.Any("validator_parse_error", err.Error()))
 	}
 
 	return st.Err()

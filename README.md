@@ -20,7 +20,7 @@ Run gRPC and HTTP same port
 
 ~~Log all error in service and repository~~
 
-## All knowledge is gathered on internet
+## All knowledge is gathered on the internet
 
 https://cloud.google.com/apis/design/errors
 

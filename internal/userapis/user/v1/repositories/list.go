@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/tuanden0/refactor_user_ms/internal/userapis/user/v1/models"
-	"go.uber.org/zap"
 )
 
 func (m *manager) List(pg *models.Pagination, s *models.Sort, fs []*models.Filter) ([]*models.User, error) {
@@ -21,7 +20,6 @@ func (m *manager) List(pg *models.Pagination, s *models.Sort, fs []*models.Filte
 	}
 
 	if err := qs.Find(&users).Error; err != nil {
-		m.log.Error(err.Error(), zap.String("gorm", "list"))
 		return nil, err
 	}
 

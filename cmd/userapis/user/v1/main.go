@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"flag"
+	"fmt"
 	"log"
 	"net"
 	"net/http"
@@ -13,6 +14,7 @@ import (
 	"syscall"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"go.uber.org/zap"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/status"
@@ -47,38 +49,38 @@ func init() {
 func main() {
 
 	// Connect to DB
-	logger.Info("Init database", nil)
+	logger.Info("Init database")
 	gormDB, gormErr := gormdriver.ConnectDatabase()
 	if gormErr != nil {
-		logger.Error("database %v", gormErr)
+		logger.Error("failed to init database", zap.String("init_db", gormErr.Error()))
 		log.Fatal(gormErr)
 	}
-	logger.Info("Init database success", nil)
+	logger.Info("Init database success")
 
 	// Create user repo manager
-	logger.Info("Init user repository manager", nil)
-	userRepo := repositories.NewManager(gormDB, logger.Log)
-	logger.Info("Init user repository manager success", nil)
+	logger.Info("Init user repository manager")
+	userRepo := repositories.NewManager(gormDB)
+	logger.Info("Init user repository manager success")
 
 	// Create global validator
-	logger.Info("Init validator", nil)
-	validator := vd.NewValidator(*logger.Log)
+	logger.Info("Init validator")
+	validator := vd.NewValidator()
 	validator.InitValidate()
 	if validatorErr := validator.InitTranslator(); validatorErr != nil {
-		logger.Error("failed to init validator translator %v", validatorErr)
+		logger.Error("failed to init validator translator", zap.String("init_validator", validatorErr.Error()))
 		log.Fatal(validatorErr)
 	}
-	logger.Info("Init user validator success", nil)
+	logger.Info("Init user validator success")
 
 	// Create user validator
-	logger.Info("Init user validator", nil)
+	logger.Info("Init user validator")
 	userValidator := userVD.NewUserValidator(validator)
-	logger.Info("Init user validator success", nil)
+	logger.Info("Init user validator success")
 
 	// Create user service
 	userServive := userV1.NewService(userRepo, logger.Log, userValidator)
 	if err := runServer(userServive); err != nil {
-		logger.Error("server error %v", err)
+		logger.Error("server error", zap.String("server", err.Error()))
 		log.Fatal(err)
 	}
 }
@@ -175,7 +177,7 @@ func runServer(service userV1.Service) error {
 
 	// Run gRPC server
 	go func() {
-		logger.Info("gRPC server is listening on: %v", gRPCAddr)
+		logger.Info(fmt.Sprintf("gRPC server is listening on: %v", gRPCAddr))
 		errChan <- grpcServer.Serve(lis)
 	}()
 
@@ -207,7 +209,7 @@ func runServer(service userV1.Service) error {
 
 	// Run gRPC-gateway server
 	go func() {
-		logger.Info("Gateway listening on: %v", gwAddr)
+		logger.Info(fmt.Sprintf("Gateway listening on: %v", gwAddr))
 		errChan <- gwServer.ListenAndServe()
 	}()
 
@@ -215,7 +217,7 @@ func runServer(service userV1.Service) error {
 	go func() {
 		c := make(chan os.Signal, 1)
 		signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
-		logger.Info("got %v signal, graceful shutdown server", <-c)
+		logger.Info(fmt.Sprintf("got %v signal, graceful shutdown server", <-c))
 		cancel()
 		grpcServer.GracefulStop()
 		gwServer.Shutdown(ctx)

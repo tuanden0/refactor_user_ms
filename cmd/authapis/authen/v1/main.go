@@ -27,7 +27,6 @@ type authenApplication struct {
 	network        string
 	grpcAddr       string
 	gwAddr         string
-	log            *logrus.Logger
 	version        string
 	service        authv1.AuthServiceServer
 	grpcServerOpts []grpc.ServerOption
@@ -47,13 +46,12 @@ func main() {
 	flag.Parse()
 
 	// Get log
-	app.log = logger.Log
 	logFile, logErr := os.OpenFile("logs/logrus.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if logErr != nil {
 		log.Fatalf("failed to create log %v", logErr)
 	}
 	defer logFile.Close()
-	app.log.SetOutput(io.MultiWriter(os.Stdout, logFile))
+	logger.Log.SetOutput(io.MultiWriter(os.Stdout, logFile))
 
 	// Get service
 	app.service = services.NewService()
@@ -64,7 +62,7 @@ func main() {
 	app.serverpMuxOpts = setupServeMuxOptions()
 
 	if err := app.runServer(); err != nil {
-		logger.Error("server error %v", err)
+		logger.Error("init server error", logrus.Fields{"error": err})
 		log.Fatal(err)
 	}
 }
@@ -87,7 +85,7 @@ func (a *authenApplication) runServer() error {
 	authv1.RegisterAuthServiceServer(grpcServer, a.service)
 
 	go func() {
-		logger.Info(fmt.Sprintf("gRPC server is listening on: %v", a.grpcAddr))
+		logger.Info("gRPC server is listening on: " + a.grpcAddr)
 		errChan <- grpcServer.Serve(lis)
 	}()
 
